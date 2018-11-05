@@ -1,0 +1,157 @@
+/*
+ * Queries for the securelog network
+ */
+
+/*
+ * select all error messages (will only see authorized messages)
+ */
+query selectAllErrorMessages {
+    description: "Select all error messages"
+    statement:
+        SELECT org.securelog.mynetwork.ErrorMessage
+}
+
+/*
+ * select all error messages for given creator (will only see authorized messages)
+ */
+query selectAllErrorMessagesForCreator {
+    description: "Select all error messages for creator"
+    statement:
+        SELECT org.securelog.mynetwork.ErrorMessage
+            WHERE (creator == _$creator)
+}
+
+/*
+ * select all error messages for given owner (will only see authorized messages)
+ */
+query selectAllErrorMessagesForOwner {
+    description: "Select all error messages for owner"
+    statement:
+        SELECT org.securelog.mynetwork.ErrorMessage
+            WHERE (owner == _$owner)
+}
+
+/*
+ * select all error messages for given type (will only see authorized messages)
+ */
+query selectAllErrorMessagesForType {
+    description: "Select all error messages for type"
+    statement:
+        SELECT org.securelog.mynetwork.ErrorMessage
+            WHERE (errorType == _$errorType)
+}
+
+/*
+ * select all error messages for given status (will only see authorized messages)
+ */
+query selectAllErrorMessagesForStatus {
+    description: "Select all error messages for status"
+    statement:
+        SELECT org.securelog.mynetwork.ErrorMessage
+            WHERE (errorStatus == _$errorStatus)
+}
+
+/*
+ * select all error messages for given status and owner (will only see authorized messages)
+ */
+query selectAllErrorMessagesForStatusOwner {
+    description: "Select all error messages for status"
+    statement:
+        SELECT org.securelog.mynetwork.ErrorMessage
+            WHERE (errorStatus == _$errorStatus AND owner == _$owner)
+}
+
+/*
+ * select all error messages for given severity (will only see authorized messages)
+ */
+query selectAllErrorMessagesForSeverity {
+    description: "Select all error messages for severity"
+    statement:
+        SELECT org.securelog.mynetwork.ErrorMessage
+            WHERE (errorSeverity == _$errorSeverity)
+}
+
+/*
+ * select all error messages for given severity and owner (will only see authorized messages)
+ */
+query selectAllErrorMessagesForSeverityOwner {
+    description: "Select all error messages for severity"
+    statement:
+        SELECT org.securelog.mynetwork.ErrorMessage
+            WHERE (errorSeverity == _$errorSeverity AND owner == _$owner)
+}
+
+/*
+ * select all error messages with severity INFO or WARNING (will only see authorized messages)
+ */
+query selectAllErrorMessagesInfoWarn {
+    description: "Select all error messages for severity INFO and WARNING"
+    statement:
+        SELECT org.securelog.mynetwork.ErrorMessage
+            WHERE (errorSeverity == 'INFO' OR errorSeverity == 'WARNING')
+}
+
+/*
+ * Queries for the textmessage network
+ */
+
+query selectAllPublicMessages {
+    description: "Select all public messages"
+    statement:
+        SELECT org.securelog.mynetwork.Message
+}
+
+/*
+ * Private messages returned will be only those with read permission(don't need to check for owner)
+ */
+query selectAllPrivateMessages {
+    description: "Select all private messages"
+    statement:
+        SELECT org.securelog.mynetwork.directMessage
+}
+
+/*
+ * private messages returned will be only those with read permission(will be none if no read permission)
+ */
+query selectAllPrivateMessagesForRecipient {
+    description: "Select all private messages based on their recipient"
+    statement:
+        SELECT org.securelog.mynetwork.directMessage
+            WHERE (recipient == _$recipient)
+}
+
+query selectAllPublicReplies {
+    description: "Select all public replies"
+    statement:
+        SELECT org.securelog.mynetwork.Reply
+}
+
+/*
+ * replies returned will be all for given parent(read permission for all public replies)
+ */
+query selectAllPublicRepliesForParent {
+    description: "Select all public replies"
+    statement:
+        SELECT org.securelog.mynetwork.Reply
+            WHERE (replyTo == _$replyTo)
+}
+
+query selectAllPrivateReplies {
+    description: "Select all private replies"
+    statement:
+        SELECT org.securelog.mynetwork.directReply
+}
+
+query selectAllPrivateRepliesForRecipient {
+    description: "Select all private replies based on their recipient"
+    statement:
+        SELECT org.securelog.mynetwork.directReply
+            WHERE (recipient == _$recipient)
+}
+
+query selectAllPrivateRepliesForParent {
+    description: "Select all private replies based on parent message"
+    statement:
+        SELECT org.securelog.mynetwork.directReply
+            WHERE (replyTo == _$replyTo)
+}

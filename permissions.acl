@@ -1,0 +1,249 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Rules for Participant registry access
+ */
+rule User_R_Member {
+    description: "Grant users access to User resources"
+    participant: "org.securelog.mynetwork.User"
+    operation: READ
+    resource: "org.securelog.mynetwork.Member"
+    action: ALLOW
+}
+ 
+rule User_R_Level2 {
+    description: "Grant users access to User resources"
+    participant: "org.securelog.mynetwork.User"
+    operation: READ
+    resource: "org.securelog.mynetwork.Level2"
+    action: ALLOW
+}
+ 
+rule User_R_Level3 {
+    description: "Grant users access to User resources"
+    participant: "org.securelog.mynetwork.User"
+    operation: READ
+    resource: "org.securelog.mynetwork.Level3"
+    action: ALLOW
+}
+ 
+rule User_R_System {
+    description: "Grant users access to User resources"
+    participant: "org.securelog.mynetwork.User"
+    operation: READ
+    resource: "org.securelog.mynetwork.System"
+    action: ALLOW
+}
+ 
+rule Admin {
+    description: "Allow the admin full access"
+    participant: "org.securelog.mynetwork.Admin"
+    operation: ALL
+    resource: "org.securelog.mynetwork.*"
+    action: ALLOW
+}
+
+rule Member {
+    description: "Allow the member read access to informational & warning messages"
+    participant: "org.securelog.mynetwork.Member"
+    operation: READ
+    resource(m): "org.securelog.mynetwork.ErrorMessage"
+    condition: (m.errorSeverity == 'INFO' || m.errorSeverity == 'WARNING')
+    action: ALLOW
+}
+
+rule Level2 {
+    description: "Allow the level2 read access to informational,warning, and error messages"
+    participant: "org.securelog.mynetwork.Level2"
+    operation: READ
+    resource(m): "org.securelog.mynetwork.ErrorMessage"
+    condition: (m.errorSeverity == 'INFO' || m.errorSeverity == 'WARNING' || m.errorSeverity == 'ERROR')
+    action: ALLOW
+}
+
+rule Level3 {
+    description: "Allow the level3 read access to informational,warning, error, and critical messages"
+    participant: "org.securelog.mynetwork.Level3"
+    operation: READ
+    resource(m): "org.securelog.mynetwork.ErrorMessage"
+    condition: (m.errorSeverity == 'INFO' || m.errorSeverity == 'WARNING' || m.errorSeverity == 'ERROR' || m.errorSeverity == 'CRITICAL')
+    action: ALLOW
+}
+
+rule ErrorMessageOwner {
+    description: "Allow the owner of a message total access"
+    participant(u): "org.securelog.mynetwork.User"
+    operation: ALL
+    resource(m): "org.securelog.mynetwork.ErrorMessage"
+    condition: (m.owner.getIdentifier() == u.getIdentifier())
+    action: ALLOW
+}
+
+rule ErrorMessageCreator {
+    description: "Allow the owner of a message total access"
+    participant(u): "org.securelog.mynetwork.User"
+    operation: ALL
+    resource(m): "org.securelog.mynetwork.ErrorMessage"
+    condition: (m.creator.getIdentifier() == u.getIdentifier())
+    action: ALLOW
+}
+
+rule SystemCanPostErrorMessages {
+    description: "Allow all participants to submit send transactions"
+    participant: "org.securelog.mynetwork.System"
+    operation: CREATE
+    resource: "org.securelog.mynetwork.postErrorMessage"
+    action: ALLOW
+}
+
+rule EverybodyCanUpdateEMOwner {
+    description: "Allow all participants to submit update error message owner"
+    participant: "org.securelog.mynetwork.User"
+    operation: CREATE
+    resource: "org.securelog.mynetwork.updateErrorMessageOwner"
+    action: ALLOW
+}
+
+rule EverybodyCanUpdateEMStatus {
+    description: "Allow all participants to submit update error message status"
+    participant: "org.securelog.mynetwork.User"
+    operation: CREATE
+    resource: "org.securelog.mynetwork.updateErrorMessageStatus"
+    action: ALLOW
+}
+
+rule EverybodyCanUpdateEMSeverity {
+    description: "Allow all participants to submit update error message severity"
+    participant: "org.securelog.mynetwork.User"
+    operation: CREATE
+    resource: "org.securelog.mynetwork.updateErrorMessageSeverity"
+    action: ALLOW
+}
+
+rule SystemACL {
+  description:  "System ACL to permit all access"
+  participant: "org.hyperledger.composer.system.Participant"
+  operation: ALL
+  resource: "org.hyperledger.composer.system.**"
+  action: ALLOW
+}
+
+rule NetworkAdminUser {
+    description: "Grant business network administrators full access to user resources"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "**"
+    action: ALLOW
+}
+
+rule NetworkAdminSystem {
+    description: "Grant business network administrators full access to system resources"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "org.hyperledger.composer.system.**"
+    action: ALLOW
+}
+
+rule AdminMsg {
+    description: "Allow the admin full access"
+    participant: "org.securelog.mynetwork.Admin"
+    operation: ALL
+    resource: "org.securelog.mynetwork.*"
+    action: ALLOW
+}
+
+rule MemberMsg {
+    description: "Allow the member read access"
+    participant: "org.securelog.mynetwork.Member"
+    operation: READ
+    resource: "org.securelog.mynetwork.publicMessage"
+    action: ALLOW
+}
+
+rule MessageOwner {
+    description: "Allow the owner of a message total access"
+    participant(u): "org.securelog.mynetwork.User"
+    operation: ALL
+    resource(m): "org.securelog.mynetwork.publicMessage"
+    condition: (m.creator.getIdentifier() == u.getIdentifier())
+    action: ALLOW
+}
+
+rule PrivateMessageOwner {
+    description: "Allow the owner of a message total access"
+    participant(u): "org.securelog.mynetwork.User"
+    operation: ALL
+    resource(m): "org.securelog.mynetwork.privateMessage"
+    condition: (m.creator.getIdentifier() == u.getIdentifier())
+    action: ALLOW
+}
+
+rule MessageRecipient {
+    description: "Allow the recipient of a message read access"
+    participant(u): "org.securelog.mynetwork.User"
+    operation: READ
+    resource(m): "org.securelog.mynetwork.privateMessage"
+    condition: (m.recipient.getIdentifier() == u.getIdentifier())
+    action: ALLOW    
+}
+
+rule EverybodyCanSubmitMessages {
+    description: "Allow all participants to submit send transactions"
+    participant: "org.securelog.mynetwork.User"
+    operation: CREATE
+    resource: "org.securelog.mynetwork.sendPublicMessage"
+    action: ALLOW
+}
+
+rule EverybodyCanSubmitPrivateMessages {
+    description: "Allow all participants to send transactions"
+    participant: "org.securelog.mynetwork.User"
+    operation: CREATE
+    resource: "org.securelog.mynetwork.sendPrivateMessage"
+    action: ALLOW
+}
+
+rule EverybodyCanSubmitReplies {
+    description: "Allow all participants to submit send transactions"
+    participant: "org.securelog.mynetwork.User"
+    operation: CREATE
+    resource: "org.securelog.mynetwork.sendPublicReply"
+    action: ALLOW
+}
+
+rule EverybodyCanSubmitPrivateReplies {
+    description: "Allow all participants to submit send transactions"
+    participant: "org.securelog.mynetwork.User"
+    operation: CREATE
+    resource: "org.securelog.mynetwork.sendPrivateReply"
+    action: ALLOW
+}
+
+rule EverybodyCanUpdateSubjects {
+    description: "Allow all participants to submit update transactions"
+    participant: "org.securelog.mynetwork.User"
+    operation: CREATE
+    resource: "org.securelog.mynetwork.updateSubject"
+    action: ALLOW
+}
+
+rule EverybodyCanUpdateValues {
+    description: "Allow all participants to submit update transactions"
+    participant: "org.securelog.mynetwork.User"
+    operation: CREATE
+    resource: "org.securelog.mynetwork.updateValue"
+    action: ALLOW
+}
+

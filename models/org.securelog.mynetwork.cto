@@ -1,0 +1,233 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Write your model definitions here
+ */
+
+namespace org.securelog.mynetwork
+
+abstract participant User identified by userId {
+  o String userId
+  o String firstName
+  o String lastName
+}
+
+participant Member extends User {
+
+}
+
+participant Level2 extends User {
+
+}
+
+participant Level3 extends User {
+
+}
+
+participant System extends User {
+  o String hostName optional
+}
+
+participant Admin extends User {
+
+}
+
+enum ErrorSeverity {
+  o INFO
+  o WARNING
+  o ERROR
+  o CRITICAL
+}
+
+enum ErrorStatus {
+  o NEW
+  o RESEARCH
+  o WORKING
+  o COMPLETE
+}
+
+asset ErrorMessage identified by messageId {
+  o String messageId
+  --> System creator
+  --> User owner
+  o String errorType
+  o ErrorSeverity errorSeverity
+  o ErrorStatus errorStatus
+  o String errorText
+}
+
+asset ErrorResponderQueue identified by ERQueueId {
+  o String ERQueueId
+  --> User ERQueueOwner
+}
+
+transaction postErrorMessage {
+  o String messageId
+  --> System creator optional
+  --> User owner
+  o String errorType
+  o ErrorSeverity errorSeverity optional
+  o ErrorStatus errorStatus optional
+  o String errorText
+}
+
+transaction updateErrorMessageOwner {
+  --> ErrorMessage oldMessage
+  --> User newOwner
+}
+
+transaction updateErrorMessageStatus {
+  --> ErrorMessage oldMessage
+  o ErrorStatus newStatus
+}
+
+transaction updateErrorMessageSeverity {
+  --> ErrorMessage oldMessage
+  o ErrorSeverity newSeverity
+}
+
+event ErrorMessageCreated {
+  o String newMessage
+  --> System creator
+  --> User owner
+  o String errorType
+  o ErrorSeverity errorSeverity
+}
+
+event ErrorMessageOwnerUpdated {
+  o String oldMessage
+  --> User oldOwner
+  --> User newOwner
+}
+
+event ErrorMessageStatusUpdated {
+  o String oldMessage
+  o ErrorStatus oldStatus
+  o ErrorStatus newStatus
+}
+
+event ErrorMessageSeverityUpdated {
+  o String oldMessage
+  o ErrorSeverity oldSeverity
+  o ErrorSeverity newSeverity
+}
+
+abstract asset baseMessage identified by messageId {
+  o String messageId
+  --> User creator
+  o String subject
+  o String value
+}
+
+abstract asset publicMessage extends baseMessage {
+}
+
+abstract asset privateMessage extends baseMessage {
+
+}
+
+asset Message extends publicMessage {
+
+}
+
+asset Reply extends publicMessage {
+  --> publicMessage replyTo
+}
+
+asset directMessage extends privateMessage {
+  --> User recipient
+}
+
+asset directReply extends privateMessage {
+  --> User recipient
+  --> privateMessage replyTo
+}
+
+transaction sendPublicMessage {
+  --> User creator optional
+  o String messageId
+  o String value
+  o String subject
+}
+
+transaction sendPublicReply {
+  --> publicMessage parentMessage
+  --> User creator optional
+  o String replyId
+  o String value
+  o String subject
+}
+
+transaction sendPrivateMessage {
+  --> User creator optional
+  --> User recipient
+  o String messageId
+  o String value
+  o String subject
+}
+
+concept conceptPrivateMessage {
+  --> User creator optional
+  --> User recipient
+  o String messageId
+  o String value
+  o String subject
+}
+
+transaction sendPrivateReply {
+  --> privateMessage parentMessage
+  --> User creator optional
+  --> User recipient
+  o String replyId
+  o String value
+  o String subject
+}
+
+transaction updateSubject {
+  --> baseMessage oldMessage
+  o String newSubject
+}
+
+transaction updateValue {
+  --> baseMessage oldMessage
+  o String newValue
+}
+
+event MessageCreated {
+  o String newMessage
+  --> User creator
+  --> User recipient optional
+  o String subject
+}
+
+event ReplyCreated {
+  o String newReply
+  o String replyTo
+  --> User creator
+  --> User recipient optional
+  o String subject
+}
+
+event SubjectUpdated {
+  o String oldMessage
+  o String oldSubject
+  o String newSubject
+}
+
+event ValueUpdated {
+  o String oldMessage
+  o String oldValue
+  o String newValue
+}
